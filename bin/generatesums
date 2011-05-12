@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'checksum_tools'
+require 'optparse'
+require 'progressbar'
+
+digests = []
+filemasks = []
+options = {
+  :exclude => [],
+  :extension => '.digest',
+  :overwrite => false,
+  :recursive => false,
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: $0 [options]"
+  
+  opts.on('-d', '--digest DIGEST', "Generate checksums of type DIGEST (Valid values: #{Checksum::Tools.digests.join(', ')})") do |digest|
+    Checksum::Tools.digest_for(digest.to_sym)
+    digests << digest.to_sym
+  end
+  
+  opts.on('-e', '--extension EXT', "File extension for digest files") do |ext|
+    options[:extension] = ext
+  end
+  
+  opts.on('-f', '--filemask MASK', "Include files matching MASK") do |mask|
+    filemasks << mask
+  end
+
+  opts.on('-o', '--overwrite', "Overwrite existing digest files") do
+    options[:overwrite] = true
+  end
+  
+  opts.on('-r', '--recursive', "Recurse into subdirectories") do
+    options[:recursive] = true
+  end
+  
+  opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
+    options[:exclude] << mask
+  end
+  
+  opts.on('-h', '--help', "Show help") do
+    puts opts
+    exit
+  end
+end
+
+optparse.parse!
+filemasks << '*' if filemasks.length == 0
+digests << :md5 if digests.length == 0
+
+args = digests + [options]
+tool = Checksum::Tools.new(*args)
+pbar = nil
+tool.create_digest_files(".",filemasks) do |filename, size, pos|
+  if pos == -1
+    pbar.finish unless pbar.nil?
+    pbar = nil
+  else
+    if pbar.nil?
+      pbar = ProgressBar.new(File.basename(filename), size)
+    end
+    pbar.set(pos)
+  end
+end
+pbar.finish
