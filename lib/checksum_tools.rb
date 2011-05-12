@@ -120,6 +120,9 @@ module Checksum
 
     def verify_digest_file(filename, &block)
       digest_file = digest_filename(filename)
+      unless File.exists?(digest_file)
+        return { :digest_file => false }
+      end
       digest_data = File.read(digest_file).split(/\n/)
       unless File.basename(digest_data.shift) == File.basename(filename)
         warn "WARNING: Filename mismatch in #{digest_file}: #{File.basename(digest_data.shift)}"
