@@ -6,7 +6,7 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "checksum-tools"
-  s.version     = "0.6.1"
+  s.version     = "0.6.2"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Klein"]
   s.email       = ["mbklein@stanford.edu"]
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   
   # Bundler will install these gems too if you've checked out checksum-tools source from git and run 'bundle install'
   # It will not add these as dependencies if you require checksum-tools for other projects
-  s.add_development_dependency "lyberteam-devel", ">=0.1.1"
+  s.add_development_dependency "lyberteam-devel", ">=0.2.0"
   s.add_development_dependency "rake", ">=0.8.7"
   s.add_development_dependency "rcov"
   s.add_development_dependency "rdoc"
@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ruby-debug"
   s.add_development_dependency "yard"
  
-  s.files        = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*', 'spec/**/*'].to_a
+  s.files        = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*'].to_a
   s.bindir       = 'bin'
   s.require_path = 'lib'
 end
