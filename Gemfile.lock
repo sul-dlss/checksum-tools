@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    checksum-tools (0.5.0)
+    checksum-tools (0.6.1)
       progressbar
 
 GEM
@@ -11,7 +11,7 @@ GEM
     columnize (0.3.2)
     i18n (0.5.0)
     linecache (0.43)
-    lyberteam-devel (0.1.1)
+    lyberteam-devel (0.2.0)
       pony
       rake (>= 0.8.7)
     mail (2.3.0)
