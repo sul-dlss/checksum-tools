@@ -1,0 +1,136 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+require 'checksum_tools'
+require 'optparse'
+require 'progressbar'
+
+@pbar = nil
+def progress(filename, size, pos)
+  if pos == -1
+    @pbar.finish unless @pbar.nil?
+    @pbar = nil
+  else
+    if @pbar.nil?
+      @pbar = ProgressBar.new(File.basename(filename), size)
+    end
+    @pbar.set(pos)
+  end
+end
+
+def generate(tool, options)
+  tool.create_digest_files(".",options[:filemasks]) do |filename, size, pos|
+    progress(filename, size, pos) if options[:progress]
+  end
+end
+
+def verify(tool, options)
+  tool.verify_digest_files(".",options[:filemasks]) do |filename, size, pos, result|
+    if result.nil?
+      progress(filename, size, pos) if options[:progress]
+    else
+      progress(filename, -1, -1) if options[:progress]
+      result.delete_if { |k,v| v == true }
+      if result.length == 0
+        print "PASS"
+      else
+        print "FAIL [#{result.keys.join(',')}]"
+      end
+      puts " #{filename}"
+    end
+  end
+end
+
+VALID_ACTIONS = ['generate','verify']
+
+config_file_options = begin
+  YAML.load(File.read(File.join(ENV['HOME'], '.checksum-tools')))
+rescue
+  {}
+end
+
+default_options = {
+  :action => 'verify',
+  :digests => [],
+  :filemasks => [],
+  :progress => true,
+  :exclude => [],
+  :extension => '.digest',
+  :overwrite => false,
+  :recursive => false
+}
+
+cmdline_options = {}
+dry_run = false
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename($0)} [options]"
+
+  opts.on('-a', '--action ACTION', VALID_ACTIONS, "Specify action to take", "#{VALID_ACTIONS.join('|')}") do |action|
+    cmdline_options[:action] = action
+  end
+  
+  opts.on('-c', '--config FILE', "Load configuration from FILE") do |filename|
+    config_file_options = YAML.load(File.read(filename))
+  end
+  
+  opts.on('-d', '--digest DIGEST', Checksum::Tools.digests, "Generate checksums of type DIGEST", 
+      "#{Checksum::Tools.digests.join('|')}") do |digest|
+    digests << digest.to_sym
+  end
+  
+  opts.on('-e', '--extension EXT', "File extension for digest files") do |ext|
+    cmdline_options[:extension] = ext
+  end
+  
+  opts.on('-f', '--filemask MASK', "Include files matching MASK") do |mask|
+    filemasks << mask
+  end
+
+  opts.on('-n', '--no-action', "Dry run; don't execute") do
+    dry_run = true
+  end
+  
+  opts.on('-o', '--overwrite', "Overwrite existing digest files") do
+    cmdline_options[:overwrite] = true
+  end
+  
+  opts.on('-q', '--quiet', "Hide the progress bar") do
+    cmdline_options[:progress] = false
+  end
+  
+  opts.on('-r', '--recursive', "Recurse into subdirectories") do
+    cmdline_options[:recursive] = true
+  end
+  
+  opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
+    cmdline_options[:exclude] << mask
+  end
+  
+  opts.on_tail('-h', '--help', "Show this help message") do
+    puts opts
+    exit
+  end
+end
+
+optparse.parse!
+
+options = default_options.merge(config_file_options).merge(cmdline_options)
+options[:filemasks] << '*' if options[:filemasks].length == 0
+options[:digests] << :md5 if options[:digests].length == 0
+
+args = options[:digests]
+args += [Hash[options.select { |k,v| [:exclude,:extension,:overwrite,:recursive].include?(k) }]]
+tool = Checksum::Tools.new(*args)
+
+if dry_run
+  puts options.inspect
+  puts tool.inspect
+  exit
+end
+
+case options[:action]
+when 'generate' then generate(tool, options)
+when 'verify'   then verify(tool, options)
+end
