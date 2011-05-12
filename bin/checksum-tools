@@ -76,7 +76,7 @@ optparse = OptionParser.new do |opts|
   
   opts.on('-d', '--digest DIGEST', Checksum::Tools.digests, "Generate checksums of type DIGEST", 
       "#{Checksum::Tools.digests.join('|')}") do |digest|
-    digests << digest.to_sym
+    (cmdline_options[:digests] ||= []) << digest.to_sym
   end
   
   opts.on('-e', '--extension EXT', "File extension for digest files") do |ext|
@@ -84,7 +84,7 @@ optparse = OptionParser.new do |opts|
   end
   
   opts.on('-f', '--filemask MASK', "Include files matching MASK") do |mask|
-    filemasks << mask
+    (cmdline_options[:filemasks] ||= []) << mask
   end
 
   opts.on('-n', '--no-action', "Dry run; don't execute") do
