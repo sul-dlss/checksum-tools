@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    checksum-tools (0.6.2)
+    checksum-tools (0.6.3)
       progressbar
 
 GEM
@@ -41,7 +41,7 @@ PLATFORMS
 
 DEPENDENCIES
   checksum-tools!
-  lyberteam-devel (>= 0.2.0)
+  lyberteam-devel (>= 0.2.1)
   rake (>= 0.8.7)
   rcov
   rdoc

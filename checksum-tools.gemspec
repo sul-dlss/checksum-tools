@@ -6,13 +6,14 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "checksum-tools"
-  s.version     = "0.6.3"
+  s.version     = "0.6.4"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Klein"]
   s.email       = ["mbklein@stanford.edu"]
   s.summary     = "Checksum creation and verification tools"
   s.description = "Contains classes and executable files to generate and verify checksums"
- 
+  s.executables = ["checksum-tools"]
+  
   s.required_rubygems_version = ">= 1.3.6"
   
   # Runtime dependencies
