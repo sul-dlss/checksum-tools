@@ -44,6 +44,7 @@ module Checksum
         @opts.merge!(args.pop)
       end
       @opts[:exclude] << digest_filename("*")
+      @opts[:exclude].uniq!
       args.each { |arg| self.class.digest_for(arg) }
       @digest_types = args
     end
