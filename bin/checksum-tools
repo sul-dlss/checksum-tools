@@ -8,14 +8,16 @@ require 'yaml'
 
 @pbar = nil
 def progress(filename, size, pos)
-  if pos == -1
-    @pbar.finish unless @pbar.nil?
-    @pbar = nil
-  else
-    if @pbar.nil?
-      @pbar = ProgressBar.new(File.basename(filename), size)
+  unless size.nil?
+    if pos == -1
+      @pbar.finish unless @pbar.nil?
+      @pbar = nil
+    else
+      if @pbar.nil?
+        @pbar = ProgressBar.new(File.basename(filename), size)
+      end
+      @pbar.set(pos)
     end
-    @pbar.set(pos)
   end
 end
 
