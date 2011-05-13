@@ -4,6 +4,7 @@ require 'rubygems'
 require 'checksum_tools'
 require 'optparse'
 require 'progressbar'
+require 'yaml'
 
 @pbar = nil
 def progress(filename, size, pos)
@@ -43,8 +44,9 @@ end
 
 VALID_ACTIONS = ['generate','verify']
 
+config_file = File.join(ENV['HOME'], '.checksum-tools')
 config_file_options = begin
-  YAML.load(File.read(File.join(ENV['HOME'], '.checksum-tools')))
+  YAML.load(File.read(config_file))
 rescue
   {}
 end
@@ -71,7 +73,8 @@ optparse = OptionParser.new do |opts|
   end
   
   opts.on('-c', '--config FILE', "Load configuration from FILE") do |filename|
-    config_file_options = YAML.load(File.read(filename))
+    config_file = filename
+    config_file_options = YAML.load(File.read(config_file))
   end
   
   opts.on('-d', '--digest DIGEST', Checksum::Tools.digests, "Generate checksums of type DIGEST", 
@@ -118,14 +121,17 @@ optparse.parse!
 options = default_options.merge(config_file_options).merge(cmdline_options)
 options[:filemasks] << '*' if options[:filemasks].length == 0
 options[:digests] << :md5 if options[:digests].length == 0
+options[:digests].uniq!
+options[:filemasks].uniq!
+options[:exclude].uniq!
 
 args = options[:digests]
 args += [Hash[options.select { |k,v| [:exclude,:extension,:overwrite,:recursive].include?(k) }]]
 tool = Checksum::Tools.new(*args)
 
 if dry_run
-  puts options.inspect
-  puts tool.inspect
+  puts "Defaults loaded from #{config_file}"
+  puts YAML.dump(options)
   exit
 end
 
