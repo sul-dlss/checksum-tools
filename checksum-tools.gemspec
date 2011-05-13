@@ -6,7 +6,7 @@ $:.unshift lib unless $:.include?(lib)
   
 Gem::Specification.new do |s|
   s.name        = "checksum-tools"
-  s.version     = "0.6.5"
+  s.version     = "0.6.6"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Klein"]
   s.email       = ["mbklein@stanford.edu"]
