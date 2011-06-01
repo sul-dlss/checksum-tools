@@ -124,14 +124,25 @@ module Checksum
       unless File.exists?(digest_file)
         return { :digest_file => false }
       end
-      digest_data = File.read(digest_file).split(/\n/)
-      unless File.basename(digest_data.shift) == File.basename(filename)
-        warn "WARNING: Filename mismatch in #{digest_file}: #{File.basename(digest_data.shift)}"
-      end
-      hashes = digest_data.inject({}) do |collector,sum|
-        (hash,digest) = sum.split(/::/,2)
-        collector[hash.to_sym] = digest
-        collector
+      
+      hashes = {}
+      digest_data = File.read(digest_file)
+
+      ext_type = File.extname(digest_file)[1..-1].downcase.to_sym
+      # Check to see if the digest file extension implies a specific digest type (e.g., .md5)
+      if @@digests.has_key?(ext_type)
+        # Find a hex value of the correct length in the digest file
+        digest = digest_data.scan(/((?:[0-9a-f]{4})+)/im).flatten.find { |d| d.length == self.class.digest_for(ext_type).length * 2 }
+        hashes[ext_type] = digest
+      else
+        unless File.basename(digest_data.shift) == File.basename(filename)
+          warn "WARNING: Filename mismatch in #{digest_file}: #{File.basename(digest_data.shift)}"
+        end
+        hashes = digest_data.split(/\n/).inject({}) do |collector,sum|
+          (hash,digest) = sum.split(/::/,2)
+          collector[hash.to_sym] = digest
+          collector
+        end
       end
       verify_file(filename, hashes, &block)
     end
@@ -141,7 +152,7 @@ module Checksum
         actual = digest_file(filename, &block)
         result = {}
         actual.each_pair do |hash,digest|
-          result[hash] = hashes[hash] == digest
+          result[hash] = hashes[hash].downcase == digest.downcase
         end
         result
       end
