@@ -87,3 +87,5 @@ Display a simple help message and exit.
 == Releases
 - <b>0.6.6</b> Initial release
 - <b>0.7.0</b> Added ability to verify against digest files created by other tools
+- <b>0.7.1</b> Added -v / --version switch
+- <b>0.7.2</b> Fixed shift error when evaluating .digest files
