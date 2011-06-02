@@ -27,6 +27,7 @@ checksum-tools --- Generate or verify checksums for a set of files
     -o, --overwrite                  Overwrite existing digest files
     -q, --quiet                      Hide the progress bar
     -r, --recursive                  Recurse into subdirectories
+    -v, --version                    Print version and exit
     -x, --exclude MASK               Exclude files matching MASK
     -h, --help                       Show this help message
 
@@ -72,6 +73,9 @@ Do not display a progress bar for each file generated.
 
 Recurse into subdirectories.
 
+<tt>-v, --version</tt>
+Print version number and exit.
+
 <tt>-x, --exclude MASK</tt>
 
 Exclude files matching <tt>MASK</tt> from the operation. Can be used to skip a certain subset of files otherwise included using the <tt>--filemask</tt> option.
@@ -83,3 +87,5 @@ Display a simple help message and exit.
 == Releases
 - <b>0.6.6</b> Initial release
 - <b>0.7.0</b> Added ability to verify against digest files created by other tools
+- <b>0.7.1</b> Added -v / --version switch
+- <b>0.7.2</b> Fixed shift error when evaluating .digest files
