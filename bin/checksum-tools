@@ -108,6 +108,11 @@ optparse = OptionParser.new do |opts|
     cmdline_options[:recursive] = true
   end
   
+  opts.on('-v', '--version', "Print version and exit") do
+    puts "checksum-tools #{Checksum::Tools::VERSION}"
+    exit
+  end
+  
   opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
     cmdline_options[:exclude] << mask
   end
