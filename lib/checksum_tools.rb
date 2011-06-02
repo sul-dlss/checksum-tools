@@ -2,7 +2,7 @@ module Checksum
 
   class Tools
 
-    VERSION = "0.7.1"
+    VERSION = "0.7.2"
     
     CHUNK_SIZE = 1048576 # 1M blocks
     DEFAULT_OPTS = { :overwrite => false, :recursive => false, :exclude => nil, :extension => '.digest' }
