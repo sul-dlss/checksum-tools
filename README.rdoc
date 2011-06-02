@@ -27,6 +27,7 @@ checksum-tools --- Generate or verify checksums for a set of files
     -o, --overwrite                  Overwrite existing digest files
     -q, --quiet                      Hide the progress bar
     -r, --recursive                  Recurse into subdirectories
+    -v, --version                    Print version and exit
     -x, --exclude MASK               Exclude files matching MASK
     -h, --help                       Show this help message
 
@@ -71,6 +72,9 @@ Do not display a progress bar for each file generated.
 <tt>-r, --recursive</tt>
 
 Recurse into subdirectories.
+
+<tt>-v, --version</tt>
+Print version number and exit.
 
 <tt>-x, --exclude MASK</tt>
 
