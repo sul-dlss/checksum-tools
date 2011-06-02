@@ -3,10 +3,12 @@ require 'rake'
 
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
-  
+
+require "checksum_tools"
+
 Gem::Specification.new do |s|
   s.name        = "checksum-tools"
-  s.version     = "0.7.0"
+  s.version     = Checksum::Tools::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Michael Klein"]
   s.email       = ["mbklein@stanford.edu"]
