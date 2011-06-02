@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    checksum-tools (0.7.1)
+    checksum-tools (0.7.2)
       progressbar
 
 GEM

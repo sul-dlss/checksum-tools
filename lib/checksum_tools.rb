@@ -134,7 +134,7 @@ module Checksum
       # Check to see if the digest file extension implies a specific digest type (e.g., .md5)
       if @@digests.has_key?(ext_type)
         # Find a hex value of the correct length in the digest file
-        digest = digest_data.scan(/((?:[0-9a-f]{4})+)/im).flatten.find { |d| d.length == self.class.digest_for(ext_type).length * 2 }
+        digest = digest_data.scan(/\b((?:[0-9a-f]{4})+)\b/im).flatten.find { |d| d.length == self.class.digest_for(ext_type).length * 2 }
         hashes[ext_type] = digest
       else
         digest_data = digest_data.split(/\n/)
