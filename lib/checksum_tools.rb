@@ -137,10 +137,11 @@ module Checksum
         digest = digest_data.scan(/((?:[0-9a-f]{4})+)/im).flatten.find { |d| d.length == self.class.digest_for(ext_type).length * 2 }
         hashes[ext_type] = digest
       else
+        digest_data = digest_data.split(/\n/)
         unless File.basename(digest_data.shift) == File.basename(filename)
           warn "WARNING: Filename mismatch in #{digest_file}: #{File.basename(digest_data.shift)}"
         end
-        hashes = digest_data.split(/\n/).inject({}) do |collector,sum|
+        hashes = digest_data.inject({}) do |collector,sum|
           (hash,digest) = sum.split(/::/,2)
           collector[hash.to_sym] = digest
           collector
