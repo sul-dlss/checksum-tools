@@ -78,6 +78,7 @@ Do not display a progress bar for each file generated.
 Recurse into subdirectories.
 
 <tt>-v, --version</tt>
+
 Print version number and exit.
 
 <tt>-x, --exclude MASK</tt>
