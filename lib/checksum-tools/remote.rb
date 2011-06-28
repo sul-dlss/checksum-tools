@@ -62,11 +62,12 @@ module Checksum::Tools
     
     protected
     
-    def file_list(base_dir, file_mask)
-      path = [file_mask]
+    def file_list(base_dir, *file_masks)
+      path = ['*']
       path.unshift('**') if opts[:recursive]
-      result = sftp.dir[base_dir, File.join(*path)].reject { |f| f.directory? }.collect { |f| File.expand_path(File.join(base_dir, f.name)) }
-      return result
+      result = sftp.dir[base_dir, File.join(*path)]
+      result.reject! { |f| f.directory? or (not file_masks.any? { |m| File.fnmatch?(m,File.basename(f.name)) }) }
+      result.collect { |f| File.expand_path(File.join(base_dir, f.name)) }
     end
 
     def file_open(*args, &block)

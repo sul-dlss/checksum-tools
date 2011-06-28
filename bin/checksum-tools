@@ -83,7 +83,8 @@ def tool_for(user_options)
 end
 
 def parse_path(path)
-  user,host,dir = path.scan(/^(?:(.+)@)?(?:(.+):)?(.+)$/).flatten
+  user,host,dir = path.to_s.scan(/^(?:(.+)@)?(?:(.+):)?(?:(.+))?$/).flatten
+  dir ||= '.'
   result = { :remote => { :user => user, :host => host }, :dir => dir }
   return result
 end
@@ -100,10 +101,8 @@ end
 cmdline_options = {}
 dry_run = false
 
-cmdline_options.merge!(parse_path(ARGV.pop))
-
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: #{File.basename($0)} [options] <path>"
+  opts.banner = "Usage: #{File.basename($0)} [options] [path]"
 
   opts.on('-a', '--action ACTION', VALID_ACTIONS, "Specify action to take", "#{VALID_ACTIONS.join('|')}") do |action|
     cmdline_options[:action] = action
@@ -147,6 +146,7 @@ optparse = OptionParser.new do |opts|
   end
 
   opts.on_tail('-D', '--digest-types', "Show digest types") do
+    cmdline_options.merge!(parse_path(ARGV.pop))
     puts "Available digest types for #{cmdline_options[:remote][:host] || 'local system'}:"
     puts tool_for(cmdline_options).digests.join(' ')
     exit
@@ -164,8 +164,7 @@ optparse = OptionParser.new do |opts|
 end
 
 optparse.parse!
-
-puts cmdline_options.inspect
+cmdline_options.merge!(parse_path(ARGV.pop))
 options = make_options(config_file_options.merge(cmdline_options))
 
 if (options[:extension] !~ /[A-Za-z0-9]/) or (options[:dir].nil?)
