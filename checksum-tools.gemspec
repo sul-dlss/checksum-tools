@@ -4,7 +4,7 @@ require 'rake'
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require "checksum_tools"
+require "checksum-tools"
 
 Gem::Specification.new do |s|
   s.name        = "checksum-tools"
@@ -20,6 +20,9 @@ Gem::Specification.new do |s|
   
   # Runtime dependencies
   s.add_dependency "progressbar"
+  s.add_dependency "net-ssh"
+  s.add_dependency "net-ssh-kerberos"
+  s.add_dependency "net-sftp"
   
   # Bundler will install these gems too if you've checked out checksum-tools source from git and run 'bundle install'
   # It will not add these as dependencies if you require checksum-tools for other projects
