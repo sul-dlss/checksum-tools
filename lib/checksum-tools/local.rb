@@ -87,11 +87,14 @@ module Checksum::Tools
 
     protected
     
-    def file_list(base_dir, file_mask)
-      path = [base_dir, file_mask]
+    def file_list(base_dir, *file_masks)
+      path = [base_dir, '*']
       path.insert(1,'**') if opts[:recursive]
-      result = Dir[File.join(*path)].reject { |f| File.directory?(f) }
-      return result
+      puts File.join(*path)
+      result = Dir[File.join(*path)]
+      result.reject! { |f| File.directory?(f) or (not file_masks.any? { |m| File.fnmatch?(m,File.basename(f)) }) }
+      puts result.inspect
+      result
     end
   
     def file_open(*args, &block)

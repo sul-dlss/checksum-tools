@@ -118,21 +118,12 @@ module Checksum
           raise ArgumentError, "no block given"
         end
     
-        targets = []
-        include_masks.each do |mask|
-          targets += file_list(base_dir, mask)
-        end
-        targets.sort!
-        targets.uniq!
-      
-        Array(opts[:exclude]).each do |mask|
-          targets -= file_list(base_dir, mask)
-        end
+        targets = file_list(base_dir, *include_masks).reject { |f| Array(opts[:exclude]).any? { |mask| File.fnmatch?(mask,f) } }
         targets.sort!
         targets.uniq!
       
         result = {}
-        targets.sort.uniq.each do |filename|
+        targets.each do |filename|
           result[filename] = yield(filename)
         end
         return result
