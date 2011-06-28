@@ -1,10 +1,26 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'checksum_tools'
+begin
+  require 'bundler/setup'
+rescue LoadError
+  # We'll try to run without bundler
+end
+require 'checksum-tools'
 require 'optparse'
 require 'progressbar'
 require 'yaml'
+
+DEFAULT_OPTIONS = {
+  :action => 'verify',
+  :digests => [],
+  :filemasks => [],
+  :progress => true,
+  :exclude => [],
+  :extension => '.digest',
+  :overwrite => false,
+  :recursive => false
+}
 
 @pbar = nil
 def progress(filename, size, pos)
@@ -22,13 +38,13 @@ def progress(filename, size, pos)
 end
 
 def generate(tool, options)
-  tool.create_digest_files(".",options[:filemasks]) do |filename, size, pos|
+  tool.create_digest_files(options[:dir],options[:filemasks]) do |filename, size, pos|
     progress(filename, size, pos) if options[:progress]
   end
 end
 
 def verify(tool, options)
-  tool.verify_digest_files(".",options[:filemasks]) do |filename, size, pos, result|
+  tool.verify_digest_files(options[:dir],options[:filemasks]) do |filename, size, pos, result|
     if result.nil?
       progress(filename, size, pos) if options[:progress]
     else
@@ -44,6 +60,34 @@ def verify(tool, options)
   end
 end
 
+def make_options(user_options)
+  options = DEFAULT_OPTIONS.merge(user_options)
+  options[:filemasks] << '*' if options[:filemasks].length == 0
+  options[:digests] << :md5 if options[:digests].length == 0
+  options[:digests].uniq!
+  options[:filemasks].uniq!
+  options[:exclude].uniq!
+  return options
+end
+
+def tool_for(user_options)
+  options = make_options(user_options)
+  args = options[:digests]
+  args += [Hash[options.select { |k,v| [:exclude,:extension,:overwrite,:recursive].include?(k) }]]
+
+  if remote = options[:remote] and remote[:host]
+    Checksum::Tools::Remote.new(remote[:host],remote[:user],*args)
+  else
+    Checksum::Tools::Local.new(*args)
+  end
+end
+
+def parse_path(path)
+  user,host,dir = path.scan(/^(?:(.+)@)?(?:(.+):)?(.+)$/).flatten
+  result = { :remote => { :user => user, :host => host }, :dir => dir }
+  return result
+end
+
 VALID_ACTIONS = ['generate','verify']
 
 config_file = File.join(ENV['HOME'], '.checksum-tools')
@@ -53,22 +97,13 @@ rescue
   {}
 end
 
-default_options = {
-  :action => 'verify',
-  :digests => [],
-  :filemasks => [],
-  :progress => true,
-  :exclude => [],
-  :extension => '.digest',
-  :overwrite => false,
-  :recursive => false
-}
-
 cmdline_options = {}
 dry_run = false
 
+cmdline_options.merge!(parse_path(ARGV.pop))
+
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: #{File.basename($0)} [options]"
+  opts.banner = "Usage: #{File.basename($0)} [options] <path>"
 
   opts.on('-a', '--action ACTION', VALID_ACTIONS, "Specify action to take", "#{VALID_ACTIONS.join('|')}") do |action|
     cmdline_options[:action] = action
@@ -79,8 +114,7 @@ optparse = OptionParser.new do |opts|
     config_file_options = YAML.load(File.read(config_file))
   end
   
-  opts.on('-d', '--digest DIGEST', Checksum::Tools.digests, "Generate checksums of type DIGEST", 
-      "#{Checksum::Tools.digests.join('|')}") do |digest|
+  opts.on('-d', '--digest DIGEST', "Generate checksums of type DIGEST") do |digest|
     (cmdline_options[:digests] ||= []) << digest.to_sym
   end
   
@@ -108,13 +142,19 @@ optparse = OptionParser.new do |opts|
     cmdline_options[:recursive] = true
   end
   
-  opts.on('-v', '--version', "Print version and exit") do
-    puts "checksum-tools #{Checksum::Tools::VERSION}"
+  opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
+    cmdline_options[:exclude] << mask
+  end
+
+  opts.on_tail('-D', '--digest-types', "Show digest types") do
+    puts "Available digest types for #{cmdline_options[:remote][:host] || 'local system'}:"
+    puts tool_for(cmdline_options).digests.join(' ')
     exit
   end
   
-  opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
-    cmdline_options[:exclude] << mask
+  opts.on_tail('-v', '--version', "Print version and exit") do
+    puts "checksum-tools #{Checksum::Tools::VERSION}"
+    exit
   end
   
   opts.on_tail('-h', '--help', "Show this help message") do
@@ -125,16 +165,13 @@ end
 
 optparse.parse!
 
-options = default_options.merge(config_file_options).merge(cmdline_options)
-options[:filemasks] << '*' if options[:filemasks].length == 0
-options[:digests] << :md5 if options[:digests].length == 0
-options[:digests].uniq!
-options[:filemasks].uniq!
-options[:exclude].uniq!
+puts cmdline_options.inspect
+options = make_options(config_file_options.merge(cmdline_options))
 
-args = options[:digests]
-args += [Hash[options.select { |k,v| [:exclude,:extension,:overwrite,:recursive].include?(k) }]]
-tool = Checksum::Tools.new(*args)
+if (options[:extension] !~ /[A-Za-z0-9]/) or (options[:dir].nil?)
+  puts optparse
+  exit
+end
 
 if dry_run
   puts "Defaults loaded from #{config_file}"
@@ -142,6 +179,7 @@ if dry_run
   exit
 end
 
+tool = tool_for(options)
 case options[:action]
 when 'generate' then generate(tool, options)
 when 'verify'   then verify(tool, options)
