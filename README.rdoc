@@ -15,20 +15,20 @@ checksum-tools --- Generate or verify checksums for a set of files
 
 = Synopsis
 
-  Usage: checksum-tools [options]
+  Usage: checksum-tools [options] [path]
     -a, --action ACTION              Specify action to take
                                      generate|verify
     -c, --config FILE                Load configuration from FILE
     -d, --digest DIGEST              Generate checksums of type DIGEST
-                                     sha384|sha512|sha1|sha256|md5
     -e, --extension EXT              File extension for digest files
     -f, --filemask MASK              Include files matching MASK
     -n, --no-action                  Dry run; don't execute
     -o, --overwrite                  Overwrite existing digest files
     -q, --quiet                      Hide the progress bar
     -r, --recursive                  Recurse into subdirectories
-    -v, --version                    Print version and exit
     -x, --exclude MASK               Exclude files matching MASK
+    -D, --digest-types               Show digest types
+    -v, --version                    Print version and exit
     -h, --help                       Show this help message
 
 = Description
@@ -48,6 +48,10 @@ Load default configuration values from <tt>FILE</tt>. Default: a file called <tt
 <tt>-d, --digest DIGEST</tt>
 
 In <tt>generate</tt> mode, specifies the type of digest to generate. Valid options depend on the Ruby libraries available on the system, but usually include <tt>md5</tt>, <tt>sha1</tt>, <tt>sha256</tt>, <tt>sha384</tt>, and <tt>sha512</tt>. Default: <tt>md5</tt>. Including this option multiple times causes multiple digests to be generated for each file.
+
+<tt>-D, --digest-types</tt>
+
+Display the available digest types for the specified target directory/path/system.
 
 <tt>-e, --extension EXT</tt>
 
@@ -89,3 +93,4 @@ Display a simple help message and exit.
 - <b>0.7.0</b> Added ability to verify against digest files created by other tools
 - <b>0.7.1</b> Added -v / --version switch
 - <b>0.7.2</b> Fixed shift error when evaluating .digest files
+- <b>0.9.0</b> Added remote openssl invocation capability to generate digests on non-Ruby systems
