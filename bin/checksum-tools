@@ -37,14 +37,14 @@ def progress(filename, size, pos)
   end
 end
 
-def generate(tool, options)
-  tool.create_digest_files(options[:dir],options[:filemasks]) do |filename, size, pos|
+def generate(tool, path, options)
+  tool.create_digest_files(path,options[:filemasks]) do |filename, size, pos|
     progress(filename, size, pos) if options[:progress]
   end
 end
 
-def verify(tool, options)
-  tool.verify_digest_files(options[:dir],options[:filemasks]) do |filename, size, pos, result|
+def verify(tool, path, options)
+  tool.verify_digest_files(path,options[:filemasks]) do |filename, size, pos, result|
     if result.nil?
       progress(filename, size, pos) if options[:progress]
     else
@@ -58,35 +58,6 @@ def verify(tool, options)
       puts " #{filename}"
     end
   end
-end
-
-def make_options(user_options)
-  options = DEFAULT_OPTIONS.merge(user_options)
-  options[:filemasks] << '*' if options[:filemasks].length == 0
-  options[:digests] << :md5 if options[:digests].length == 0
-  options[:digests].uniq!
-  options[:filemasks].uniq!
-  options[:exclude].uniq!
-  return options
-end
-
-def tool_for(user_options)
-  options = make_options(user_options)
-  args = options[:digests]
-  args += [Hash[options.select { |k,v| [:exclude,:extension,:overwrite,:recursive].include?(k) }]]
-
-  if remote = options[:remote] and remote[:host]
-    Checksum::Tools::Remote.new(remote[:host],remote[:user],*args)
-  else
-    Checksum::Tools::Local.new(*args)
-  end
-end
-
-def parse_path(path)
-  user,host,dir = path.to_s.scan(/^(?:(.+)@)?(?:(.+):)?(?:(.+))?$/).flatten
-  dir ||= '.'
-  result = { :remote => { :user => user, :host => host }, :dir => dir }
-  return result
 end
 
 VALID_ACTIONS = ['generate','verify']
@@ -146,9 +117,10 @@ optparse = OptionParser.new do |opts|
   end
 
   opts.on_tail('-D', '--digest-types', "Show digest types") do
-    cmdline_options.merge!(parse_path(ARGV.pop))
-    puts "Available digest types for #{cmdline_options[:remote][:host] || 'local system'}:"
-    puts tool_for(cmdline_options).digests.join(' ')
+    path_info = Checksum::Tools.parse_path(ARGV.pop || '.')
+    tool = Checksum::Tools.new(path_info, cmdline_options)
+    puts "Available digest types for #{tool.host || 'local system'}:"
+    puts tool.digests.join(' ')
     exit
   end
   
@@ -164,10 +136,15 @@ optparse = OptionParser.new do |opts|
 end
 
 optparse.parse!
-cmdline_options.merge!(parse_path(ARGV.pop))
-options = make_options(config_file_options.merge(cmdline_options))
 
-if (options[:extension] !~ /[A-Za-z0-9]/) or (options[:dir].nil?)
+options = DEFAULT_OPTIONS.merge(config_file_options).merge(cmdline_options)
+options[:filemasks] << '*' if options[:filemasks].length == 0
+options[:digests] << :md5 if options[:digests].length == 0
+options[:digests].uniq!
+options[:filemasks].uniq!
+options[:exclude].uniq!
+
+if options[:extension] !~ /[A-Za-z0-9]/
   puts optparse
   exit
 end
@@ -178,8 +155,12 @@ if dry_run
   exit
 end
 
-tool = tool_for(options)
+args = options[:digests].dup
+args << options.dup.reject { |k,v| not [:exclude,:extension,:overwrite,:recursive].include?(k) }
+path_info = Checksum::Tools.parse_path(ARGV.pop || '.')
+tool = Checksum::Tools.new(path_info, *args)
+
 case options[:action]
-when 'generate' then generate(tool, options)
-when 'verify'   then verify(tool, options)
+when 'generate' then generate(tool, path_info[:dir], options)
+when 'verify'   then verify(tool, path_info[:dir], options)
 end

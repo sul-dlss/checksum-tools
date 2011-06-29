@@ -8,7 +8,26 @@ module Checksum
     autoload :Local, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'local')
     autoload :Remote, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'remote')
     
+    class << self
+      def new(path_info, *args)
+        if (remote = path_info[:remote])[:host].nil?
+          Local.new(*args)
+        else
+          Remote.new(remote[:host],remote[:user],*args)
+        end
+      end
+    
+      def parse_path(path)
+        user,host,dir = path.to_s.scan(/^(?:(.+)@)?(?:(.+):)?(?:(.+))?$/).flatten
+        dir ||= '.'
+        result = { :remote => { :user => user, :host => host }, :dir => dir }
+        return result
+      end
+    end
+    
     class Base
+      attr_reader :host
+      
       def initialize(*args)
         @opts = DEFAULT_OPTS
         if args.last.is_a?(Hash)
