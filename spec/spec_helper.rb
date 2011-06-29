@@ -6,7 +6,7 @@ require 'spec'
 require 'spec/autorun'
 
 require 'rubygems'
-require 'checksum_tools'
+require 'checksum-tools'
 
 Spec::Runner.configure do |config|
   
