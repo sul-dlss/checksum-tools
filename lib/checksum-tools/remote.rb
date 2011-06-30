@@ -20,18 +20,18 @@ module Checksum::Tools
     end
     
     def sftp
-      @ssh.sftp
+      @sftp ||= Net::SFTP.start(@host, @user, :auth_methods => %w(gssapi-with-mic publickey hostbased))
     end
     
     def ssh
-      @ssh ||= Net::SSH.start(@host, @user, :auth_methods => %w(gssapi-with-mic publickey hostbased), :verbose => :debug)
+      result = sftp.session
       if block_given?
-        channel = @ssh.open_channel do |ch|
+        channel = result.open_channel do |ch|
           yield(ch)
         end
         channel.wait
       end
-      @ssh
+      result
     end
 
     def exec!(cmd)
