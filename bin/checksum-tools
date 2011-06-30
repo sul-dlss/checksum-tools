@@ -2,11 +2,11 @@
 
 require 'rubygems'
 begin
-  require 'bundler/setup'
+  require 'checksum-tools'
 rescue LoadError
-  # We'll try to run without bundler
+  require 'bundler/setup'
+  require 'checksum-tools'
 end
-require 'checksum-tools'
 require 'optparse'
 require 'progressbar'
 require 'yaml'
