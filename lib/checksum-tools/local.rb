@@ -44,6 +44,10 @@ module Checksum::Tools
       self.class.digests
     end
     
+    def digest_length(type)
+      self.class.digest_for(type).hexdigest.length
+    end
+    
     def digest_file(filename)
       if File.exists?(filename)
         size = File.size?(filename)
