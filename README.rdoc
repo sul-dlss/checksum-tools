@@ -98,3 +98,4 @@ Display a simple help message and exit.
 - <b>0.9.1</b> Slight refactoring of bin/checksum-tools; removed debugging code
 - <b>0.9.2</b> Fix gem deployment problem with bundler
 - <b>0.9.3</b> Hotfix to revert SFTP/SSH object changes in 0.9.2
+- <b>0.9.4</b> [HYDRALABWARE-59] Checksum-tools anomalies
