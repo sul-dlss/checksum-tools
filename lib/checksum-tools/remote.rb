@@ -13,6 +13,7 @@ module Checksum::Tools
       super(*args)
       @host = host
       @user = user
+      @digest_length_cache = {}
     end
     
     def openssl
@@ -44,6 +45,14 @@ module Checksum::Tools
       resp.scan(/-(.+?)\s+to use the .+ message digest algorithm/).flatten.collect { |d| d.to_sym }
     end
   
+    def digest_length(type)
+      if @digest_length_cache[type].nil?
+        resp = exec! "echo - | #{openssl} dgst -#{type}"
+        @digest_length_cache[type] = resp.chomp.length
+      end
+      @digest_length_cache[type]
+    end
+    
     def digest_file(filename)
       if file_exists?(filename)
         size = file_size(filename)
