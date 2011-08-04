@@ -121,7 +121,18 @@ module Checksum
       end
 
       protected
-    
+
+      def glob_to_re(glob)
+        replacements = [
+          [/\./,'##DOT##'],[/\\\*/,'##STAR##'],[/\\\?/,'##QUEST##'],
+          [/\*/,'.*'],[/\?/,'.'],
+          [/##STAR##/,'\*'],[/##QUEST##/,'\?'],[/##DOT##/,'\.']
+        ]
+        result = glob.dup
+        replacements.each { |args| result.gsub!(*args) }
+        Regexp.new(result)
+      end
+      
       def file_read(filename)
         if file_exists?(filename)
           result = ''
@@ -136,8 +147,9 @@ module Checksum
         unless block_given?
           raise ArgumentError, "no block given"
         end
-    
-        targets = file_list(base_dir, *include_masks).reject { |f| Array(opts[:exclude]).any? { |mask| File.fnmatch?(mask,f) } }
+        
+        excludes = Array(opts[:exclude]).collect { |ex| glob_to_re(ex) }
+        targets = file_list(base_dir, *include_masks).reject { |f| excludes.any? { |re| f.match(re) } }
         targets.sort!
         targets.uniq!
       
