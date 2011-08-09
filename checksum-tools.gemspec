@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-require 'rake'
 
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
@@ -34,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "ruby-debug"
   s.add_development_dependency "yard"
  
-  s.files        = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*'].to_a
+  s.files        = Dir['lib/**/*.rb']+Dir['bin/*']+Dir['[A-Z]*']
   s.bindir       = 'bin'
   s.require_path = 'lib'
 end
