@@ -50,7 +50,7 @@ module Checksum::Tools
     
     def digest_file(filename)
       if File.exists?(filename)
-        size = File.size?(filename)
+        size = file_size(filename)
         block = block_given? ? lambda { |pos| yield(filename, size, pos) } : nil
         File.open(filename, 'r') do |io|
           yield(filename, size, 0) if block_given?

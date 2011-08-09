@@ -1,12 +1,11 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
+require 'rubygems'
 require 'bundler/setup'
 require 'spec'
 require 'spec/autorun'
 
-require 'rubygems'
-require 'checksum-tools'
+require 'tempfile'
 
 Spec::Runner.configure do |config|
   
@@ -29,3 +28,4 @@ def class_exists?(class_name)
 rescue NameError
   return false
 end
+
