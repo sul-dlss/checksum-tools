@@ -10,7 +10,8 @@ module Checksum
     
     class << self
       def new(path_info, *args)
-        if (remote = path_info[:remote])[:host].nil?
+        remote = path_info[:remote]
+        if remote.nil? or remote[:host].nil?
           Local.new(*args)
         else
           Remote.new(remote[:host],remote[:user],*args)
