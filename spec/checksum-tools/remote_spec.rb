@@ -59,6 +59,7 @@ describe Checksum::Tools::Remote do
       sftp = @mock_sftp.new
       ssh = @mock_ssh.new
       @tool = Checksum::Tools.new(Checksum::Tools.parse_path("ckuser@example.edu:#{@dir}"), :md5, :sha1, :recursive => true)
+      @tool.stub!(:remote_properties).and_return({ :openssl => 'openssl' })
       @tool.stub!(:sftp).and_return(sftp)
       @tool.stub!(:ssh).and_return(ssh)
     end
