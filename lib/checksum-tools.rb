@@ -1,12 +1,15 @@
 module Checksum
   module Tools
-    VERSION = "0.9.5"
+    VERSION = "1.0.0"
     
     CHUNK_SIZE = 1048576 # 1M blocks
     DEFAULT_OPTS = { :overwrite => false, :recursive => false, :exclude => [], :extension => '.digest' }
 
     autoload :Local, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'local')
     autoload :Remote, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'remote')
+    
+    class Exception < ::Exception; end
+    class ConfigurationError < Exception; end
     
     class << self
       def new(path_info, *args)

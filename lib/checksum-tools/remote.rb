@@ -14,6 +14,14 @@ module Checksum::Tools
       @host = host
       @user = user
       @digest_length_cache = {}
+      unless (ssl = opts.delete(:openssl)).nil?
+        begin
+          remote_properties[:openssl] = ssl
+        rescue ConfigurationError
+          @remote_properties = { :openssl => ssl }
+        end
+        write_remote_properties
+      end
     end
     
     def openssl
@@ -105,11 +113,19 @@ module Checksum::Tools
         if file_exists?(settings_file)
           @remote_properties = YAML.load(file_read(settings_file))
         else
-          @remote_properties = { :openssl => 'openssl' }
+          raise ConfigurationError, "Checksum Tools not configured for #{@user}@#{host}. Please use the --openssl parameter to specify the location of the remote openssl binary."
         end
       end
       @remote_properties
     end
+
+    def write_remote_properties
+      home_dir = exec!('echo $HOME')
+      settings_file = File.join(home_dir,".checksum-tools-system")
+      file_open(settings_file, 'w') { |io| YAML.dump(remote_properties, io) }
+      remote_properties
+    end
+    
   end
   
 end

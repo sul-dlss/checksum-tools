@@ -18,6 +18,7 @@ DEFAULT_OPTIONS = {
   :progress => true,
   :exclude => [],
   :extension => '.digest',
+  :openssl => nil,
   :overwrite => false,
   :recursive => false
 }
@@ -112,6 +113,10 @@ optparse = OptionParser.new do |opts|
     cmdline_options[:recursive] = true
   end
   
+  opts.on('-s', '--openssl PATH', "Specify location of openssl on remote server") do |arg|
+    cmdline_options[:openssl] = arg
+  end
+  
   opts.on('-x', '--exclude MASK', "Exclude files matching MASK") do |mask|
     cmdline_options[:exclude] << mask
   end
@@ -156,7 +161,7 @@ if dry_run
 end
 
 args = options[:digests].dup
-args << options.dup.reject { |k,v| not [:exclude,:extension,:overwrite,:recursive].include?(k) }
+args << options.dup.reject { |k,v| not [:exclude,:extension,:openssl,:overwrite,:recursive].include?(k) }
 path_info = Checksum::Tools.parse_path(ARGV.pop || '.')
 tool = Checksum::Tools.new(path_info, *args)
 
