@@ -17,7 +17,7 @@ module Checksum::Tools
     end
     
     def openssl
-      remote_properties[:openssl]
+      opts[:openssl] || remote_properties[:openssl]
     end
     
     def sftp
