@@ -8,6 +8,9 @@ module Checksum
     autoload :Local, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'local')
     autoload :Remote, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'remote')
     
+    class Exception < ::Exception; end
+    class ConfigurationError < Exception; end
+    
     class << self
       def new(path_info, *args)
         remote = path_info[:remote]
