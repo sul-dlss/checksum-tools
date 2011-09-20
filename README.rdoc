@@ -102,3 +102,4 @@ Display a simple help message and exit.
 - <b>0.9.5</b> Minor bug fixes and spec tests
 - <b>1.0.0</b> Add --openssl command line parameter for self-configuration of remotes
 - <b>1.0.1</b> Hotfix for broken spec test
+- <b>1.0.3</b> Hotfix for remote paths with spaces in them
