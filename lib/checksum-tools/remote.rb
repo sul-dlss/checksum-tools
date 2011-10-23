@@ -67,7 +67,7 @@ module Checksum::Tools
         yield(filename, size, 0) if block_given?
         output = {}
         digest_types.each { |key| 
-          resp = exec! "#{openssl} dgst -#{key} '#{filename}'"
+          resp = exec! "#{openssl} dgst -#{key} $'#{filename.gsub(/[']/,'\\\\\'')}'"
           output[key] = resp.split(/\= /).last
         }
         yield(filename, size, size) if block_given?
