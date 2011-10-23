@@ -44,7 +44,15 @@ module Checksum::Tools
     end
 
     def exec!(cmd)
-      ssh.exec!(cmd).chomp
+      result = ''
+      ssh do |ch|
+        ch.exec("bash -l") do |ch2, success|
+          ch2.on_data { |c,data| result += data }
+          ch2.send_data "#{cmd}\n"
+          ch2.send_data "exit\n"
+        end
+      end
+      result.chomp
     end
     
     def digests

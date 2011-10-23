@@ -62,6 +62,10 @@ describe Checksum::Tools::Remote do
       @tool.stub!(:remote_properties).and_return({ :openssl => 'openssl' })
       @tool.stub!(:sftp).and_return(sftp)
       @tool.stub!(:ssh).and_return(ssh)
+      # KLUDGE ALERT: We can't mock an entire asynchronous SSH session, so we're 
+      #               stubbing Checksum::Tools::Remote#exec! which is one of the 
+      #               methods we should be testing!
+      @tool.stub!(:exec!) { |c| %x[#{c} 2>/dev/null].chomp }
     end
   
     after :each do
