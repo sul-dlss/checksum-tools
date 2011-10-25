@@ -57,7 +57,7 @@ module Checksum::Tools
     
     def digests
       resp = ''
-      resp = exec! "#{openssl} dgst -h"
+      resp = exec! "#{openssl} dgst -h 2>&1"
       resp.scan(/-(.+?)\s+to use the .+ message digest algorithm/).flatten.collect { |d| d.to_sym }
     end
   

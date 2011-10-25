@@ -61,7 +61,7 @@ def verify(tool, path, options)
   end
 end
 
-VALID_ACTIONS = ['generate','verify']
+VALID_ACTIONS = ['generate','verify','console']
 
 config_file = File.join(ENV['HOME'], '.checksum-tools')
 config_file_options = begin
@@ -168,4 +168,5 @@ tool = Checksum::Tools.new(path_info, *args)
 case options[:action]
 when 'generate' then generate(tool, path_info[:dir], options)
 when 'verify'   then verify(tool, path_info[:dir], options)
+when 'console'  then require 'ripl'; Ripl.start :binding => binding
 end

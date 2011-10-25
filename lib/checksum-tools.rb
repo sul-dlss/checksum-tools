@@ -1,6 +1,6 @@
 module Checksum
   module Tools
-    VERSION = "1.0.5"
+    VERSION = "1.0.6"
     
     CHUNK_SIZE = 1048576 # 1M blocks
     DEFAULT_OPTS = { :overwrite => false, :recursive => false, :exclude => [], :extension => '.digest' }
