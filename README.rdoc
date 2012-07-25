@@ -106,3 +106,4 @@ Display a simple help message and exit.
 - <b>1.0.4</b> Hotfix for remote paths with singles quotes in them
 - <b>1.0.5</b> Ensure remote commands are always invoked through bash
 - <b>1.0.6</b> Fix remote digest type introspection bug introduced in 1.0.5
+- <b>1.0.7</b> Compensate for differences between OpenSSL 0.9.8 and OpenSSL 1.0.0
