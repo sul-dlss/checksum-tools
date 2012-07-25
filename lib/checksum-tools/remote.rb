@@ -64,7 +64,7 @@ module Checksum::Tools
     def digest_length(type)
       if @digest_length_cache[type].nil?
         resp = exec! "echo - | #{openssl} dgst -#{type}"
-        @digest_length_cache[type] = resp.chomp.length
+        @digest_length_cache[type] = resp.split(/\s/).last.chomp.length
       end
       @digest_length_cache[type]
     end
