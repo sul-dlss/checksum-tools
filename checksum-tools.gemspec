@@ -20,14 +20,11 @@ Gem::Specification.new do |s|
   # Runtime dependencies
   s.add_dependency "progressbar"
   s.add_dependency "net-ssh"
-  s.add_dependency "net-ssh-kerberos"
   s.add_dependency "net-sftp"
   
   # Bundler will install these gems too if you've checked out checksum-tools source from git and run 'bundle install'
   # It will not add these as dependencies if you require checksum-tools for other projects
-  s.add_development_dependency "lyberteam-devel", ">=0.2.1"
   s.add_development_dependency "rake", ">=0.8.7"
-  s.add_development_dependency "rcov"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "rspec"
   s.add_development_dependency "yard"

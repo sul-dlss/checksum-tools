@@ -11,7 +11,7 @@ checksum-tools --- Generate or verify checksums for a set of files
 
 == Installation
 
-  gem install --source http://sulair-rails-dev.stanford.edu checksum-tools
+  gem install checksum-tools
 
 = Synopsis
 

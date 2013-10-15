@@ -1,6 +1,11 @@
 require 'net/ssh'
-require 'net/ssh/kerberos'
 require 'net/sftp'
+
+begin
+require 'net/ssh/kerberos'
+rescue LoadError
+  raise LoadError.new "Include 'net-ssh-kerberos' (ruby 1.8) or 'net-ssh-krb' (ruby 1.9) in your Gemfile"
+end
 
 module Checksum::Tools
   
@@ -29,7 +34,11 @@ module Checksum::Tools
     end
     
     def sftp
-      @sftp ||= Net::SFTP.start(@host, @user, :auth_methods => %w(gssapi-with-mic publickey hostbased))
+      @sftp ||= begin
+        auth_methods = %w(gssapi-with-mic publickey hostbased) if defined? Net::SSH::Kerberos
+        auth_methods ||= %w(publickey hostbased)
+        Net::SFTP.start(@host, @user, :auth_methods => auth_methods)
+      end
     end
     
     def ssh
