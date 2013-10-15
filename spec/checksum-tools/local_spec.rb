@@ -28,7 +28,7 @@ describe Checksum::Tools::Local do
     before :each do
       @io = StringIO.new('abcdefghijklmnopqrstuvwxyz')
       @digests = { :md5 => 'c3fcd3d76192e4007dfb496cca67e13b', :sha1=>"32d10c7b8cf96570ca04ce37f2a19d84240d3a89" }
-      @listener = mock('listener')
+      @listener = double('listener')
       @tool = Checksum::Tools.new({:dir => '.'}, :md5, :sha1, :recursive => true)
     end
 
@@ -79,7 +79,7 @@ describe Checksum::Tools::Local do
     end
   
     it "should generate checksums for a tree of files" do
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,-1)
       listener.should_receive(:progress).twice.with(File.join(@dir,'one/two/report.pdf'),134833,an_instance_of(Fixnum))
       listener.should_receive(:progress).once.with(File.join(@dir,'three/video.mp4'),-1,-1)
@@ -99,7 +99,7 @@ describe Checksum::Tools::Local do
     end
   
     it "should pass verification for a tree of files" do
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,-1)
       listener.should_receive(:progress).twice.with(File.join(@dir,'one/two/report.pdf'),134833,an_instance_of(Fixnum))
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,0,{ :md5 => true, :sha1 => true })
@@ -113,7 +113,7 @@ describe Checksum::Tools::Local do
 
     it "should fail verification for a tree of files" do
       File.open(File.join(@dir,'three/video.mp4.digest'),'w') { |f| f.write("MD5(video.mp4)= 9023e975b52be97a4ef6ad4e25e2ef79\nSHA1(video.mp4)= ce828086b63e6b351d9fb6d6bc2b0838725bdf39\n") }
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,-1)
       listener.should_receive(:progress).twice.with(File.join(@dir,'one/two/report.pdf'),134833,an_instance_of(Fixnum))
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,0,{ :md5 => true, :sha1 => true })

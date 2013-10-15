@@ -59,13 +59,13 @@ describe Checksum::Tools::Remote do
       sftp = @mock_sftp.new
       ssh = @mock_ssh.new
       @tool = Checksum::Tools.new(Checksum::Tools.parse_path("ckuser@example.edu:#{@dir}"), :md5, :sha1, :recursive => true)
-      @tool.stub!(:remote_properties).and_return({ :openssl => 'openssl' })
-      @tool.stub!(:sftp).and_return(sftp)
-      @tool.stub!(:ssh).and_return(ssh)
+      @tool.stub(:remote_properties).and_return({ :openssl => 'openssl' })
+      @tool.stub(:sftp).and_return(sftp)
+      @tool.stub(:ssh).and_return(ssh)
       # KLUDGE ALERT: We can't mock an entire asynchronous SSH session, so we're 
       #               stubbing Checksum::Tools::Remote#exec! which is one of the 
       #               methods we should be testing!
-      @tool.stub!(:exec!) { |c| %x[#{c} 2>/dev/null].chomp }
+      @tool.stub(:exec!) { |c| %x[#{c} 2>/dev/null].chomp }
     end
   
     after :each do
@@ -93,7 +93,7 @@ describe Checksum::Tools::Remote do
     end
   
     it "should generate checksums for a tree of files" do
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).exactly(6).times.with(an_instance_of(String),an_instance_of(Fixnum),an_instance_of(Fixnum))
       @tool.create_digest_files(@dir, ['*.pdf','*.mp4']) do
          |*args| listener.progress(*args)
@@ -110,7 +110,7 @@ describe Checksum::Tools::Remote do
     end
   
     it "should pass verification for a tree of files" do
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,-1)
       listener.should_receive(:progress).twice.with(File.join(@dir,'one/two/report.pdf'),134833,an_instance_of(Fixnum))
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,0,{ :md5 => true, :sha1 => true })
@@ -124,7 +124,7 @@ describe Checksum::Tools::Remote do
 
     it "should fail verification for a tree of files" do
       File.open(File.join(@dir,'three/video.mp4.digest'),'w') { |f| f.write("MD5(video.mp4)= 9023e975b52be97a4ef6ad4e25e2ef79\nSHA1(video.mp4)= ce828086b63e6b351d9fb6d6bc2b0838725bdf39\n") }
-      listener = mock('listener')
+      listener = double('listener')
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,-1)
       listener.should_receive(:progress).twice.with(File.join(@dir,'one/two/report.pdf'),134833,an_instance_of(Fixnum))
       listener.should_receive(:progress).once.with(File.join(@dir,'one/two/report.pdf'),-1,0,{ :md5 => true, :sha1 => true })

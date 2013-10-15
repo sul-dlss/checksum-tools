@@ -2,12 +2,11 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 
 require 'rubygems'
 require 'bundler/setup'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
 
 require 'tempfile'
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   
 end
 
