@@ -28,11 +28,11 @@ module Checksum::Tools
         write_remote_properties
       end
     end
-    
+
     def openssl
-      remote_properties[:openssl]
+      remote_properties[:openssl] || remote_properties['openssl']
     end
-    
+
     def sftp
       @sftp ||= begin
         auth_methods = %w(gssapi-with-mic publickey hostbased) if defined? Net::SSH::Kerberos
