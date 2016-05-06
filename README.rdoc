@@ -4,6 +4,10 @@
 
 checksum-tools --- Generate or verify checksums for a set of files
 
+= Deprecation
+
+This gem should not be used for new workflows. This gem exists and is maintained for the purpose of existing workflows.
+
 = Setup
 
 == Requirements
