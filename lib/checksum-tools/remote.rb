@@ -35,7 +35,7 @@ module Checksum::Tools
 
     def sftp
       @sftp ||= begin
-        auth_methods = %w(gssapi-with-mic publickey hostbased keyboard-interactive) if defined? Net::SSH::Kerberos
+        auth_methods = %w(publickey hostbased keyboard-interactive) if defined? Net::SSH::Kerberos
         auth_methods ||= %w(publickey hostbased keyboard-interactive)
         Net::SFTP.start(@host, @user, :auth_methods => auth_methods)
       end

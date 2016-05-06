@@ -14,21 +14,24 @@ Gem::Specification.new do |s|
   s.summary     = "Checksum creation and verification tools"
   s.description = "Contains classes and executable files to generate and verify checksums"
   s.executables = ["checksum-tools"]
-  
+
   s.required_rubygems_version = ">= 1.3.6"
-  
+  s.required_ruby_version = '~> 2.0'
+
   # Runtime dependencies
   s.add_dependency "progressbar"
   s.add_dependency "net-ssh"
   s.add_dependency "net-sftp"
-  
+  s.add_dependency "net-ssh-krb"
+  s.add_dependency "highline"
+
   # Bundler will install these gems too if you've checked out checksum-tools source from git and run 'bundle install'
   # It will not add these as dependencies if you require checksum-tools for other projects
   s.add_development_dependency "rake", ">=0.8.7"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "rspec", "~> 2.14.0"
   s.add_development_dependency "yard"
- 
+
   s.files        = Dir['lib/**/*.rb']+Dir['bin/*']+Dir['[A-Z]*']
   s.bindir       = 'bin'
   s.require_path = 'lib'
