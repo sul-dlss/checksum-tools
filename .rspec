@@ -1,0 +1,4 @@
+# The tests for this gem were written
+# in a way that required they are run
+# in the order that they are defined.
+--order defined
