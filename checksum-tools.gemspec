@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   # It will not add these as dependencies if you require checksum-tools for other projects
   s.add_development_dependency "rake", ">=0.8.7"
   s.add_development_dependency "rdoc"
-  s.add_development_dependency "rspec", "~> 2.99.0"
+  s.add_development_dependency "rspec", "~> 3.7"
   s.add_development_dependency "yard"
 
   s.files        = Dir['lib/**/*.rb']+Dir['bin/*']+Dir['[A-Z]*']
