@@ -7,10 +7,10 @@ module Checksum
 
     autoload :Local, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'local')
     autoload :Remote, File.join(File.dirname(__FILE__), File.basename(__FILE__, '.rb'), 'remote')
-    
+
     class Exception < ::Exception; end
     class ConfigurationError < Exception; end
-    
+
     class << self
       def new(path_info, *args)
         remote = path_info[:remote]
@@ -20,7 +20,7 @@ module Checksum
           Remote.new(remote[:host],remote[:user],*args)
         end
       end
-    
+
       def parse_path(path)
         user,host,dir = path.to_s.scan(/^(?:(.+)@)?(?:(.+):)?(?:(.+))?$/).flatten
         dir ||= '.'
@@ -28,10 +28,10 @@ module Checksum
         return result
       end
     end
-    
+
     class Base
       attr_reader :host
-      
+
       def initialize(*args)
         @opts = DEFAULT_OPTS
         if args.last.is_a?(Hash)
@@ -41,7 +41,7 @@ module Checksum
         @opts[:exclude].uniq!
         @digest_types = args
       end
-    
+
       def digest_filename(filename)
         "#{filename}.#{opts[:extension].sub(/^\.+/,'')}"
       end
@@ -52,7 +52,7 @@ module Checksum
           create_digest_file(filename, &block)
         end
       end
-  
+
       def create_digest_file(filename, &block)
         digest_file = digest_filename(filename)
         if File.expand_path(filename) == File.expand_path(digest_file)
@@ -61,7 +61,7 @@ module Checksum
         if opts[:overwrite] or not file_exists?(digest_file)
           result = digest_file(filename, &block)
           file_open(digest_file,'w') do |cksum|
-            result.each_pair do |type,hexdigest| 
+            result.each_pair do |type,hexdigest|
               cksum.puts("#{type.to_s.upcase}(#{File.basename(filename)})= #{hexdigest}")
             end
           end
@@ -125,7 +125,7 @@ module Checksum
         end
       end
 
-      protected
+      private
 
       def glob_to_re(glob)
         replacements = [
@@ -137,7 +137,7 @@ module Checksum
         replacements.each { |args| result.gsub!(*args) }
         Regexp.new(result)
       end
-      
+
       def file_read(filename)
         if file_exists?(filename)
           result = ''
@@ -152,19 +152,19 @@ module Checksum
         unless block_given?
           raise ArgumentError, "no block given"
         end
-        
+
         excludes = Array(opts[:exclude]).collect { |ex| glob_to_re(ex) }
         targets = file_list(base_dir, *include_masks).reject { |f| excludes.any? { |re| f.match(re) } }
         targets.sort!
         targets.uniq!
-      
+
         result = {}
         targets.each do |filename|
           result[filename] = yield(filename)
         end
         return result
       end
-  
+
       def with_types(new_types)
         old_types = @digest_types
         @digest_types = new_types
@@ -175,6 +175,5 @@ module Checksum
         end
       end
     end
-  
   end
 end

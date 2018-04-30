@@ -8,9 +8,9 @@ rescue LoadError
 end
 
 module Checksum::Tools
-  
+
   class Remote < Base
-    
+
     attr :digest_types
     attr :opts
 
@@ -38,7 +38,7 @@ module Checksum::Tools
         Net::SFTP.start(@host, @user, auth_methods: %w(publickey hostbased keyboard-interactive))
       end
     end
-    
+
     def ssh
       result = sftp.session
       if block_given?
@@ -61,13 +61,13 @@ module Checksum::Tools
       end
       result.chomp
     end
-    
+
     def digests
       resp = ''
       resp = exec! "#{openssl} dgst -h 2>&1"
       resp.scan(/-(.+?)\s+to use the .+ message digest algorithm/).flatten.collect { |d| d.to_sym }
     end
-  
+
     def digest_length(type)
       if @digest_length_cache[type].nil?
         resp = exec! "echo - | #{openssl} dgst -#{type}"
@@ -75,13 +75,13 @@ module Checksum::Tools
       end
       @digest_length_cache[type]
     end
-    
+
     def digest_file(filename)
       if file_exists?(filename)
         size = file_size(filename)
         yield(filename, size, 0) if block_given?
         output = {}
-        digest_types.each { |key| 
+        digest_types.each { |key|
           resp = exec! "#{openssl} dgst -#{key} $'#{filename.gsub(/[']/,'\\\\\'')}'"
           output[key] = resp.split(/\= /).last
         }
@@ -91,9 +91,9 @@ module Checksum::Tools
         raise Errno::ENOENT, filename
       end
     end
-    
+
     protected
-    
+
     def file_list(base_dir, *file_masks)
       path = ['*']
       path.unshift('**') if opts[:recursive]
@@ -105,14 +105,14 @@ module Checksum::Tools
     def file_open(*args, &block)
       sftp.file.open(*args, &block)
     end
-    
+
     def file_exists?(filename)
       sftp.stat!(filename)
       return true
     rescue Net::SFTP::StatusException
       return false
     end
-    
+
     def file_size(filename)
       if file_exists?(filename)
         sftp.stat!(filename).size
@@ -120,13 +120,13 @@ module Checksum::Tools
         raise Errno::ENOENT, filename
       end
     end
-    
+
     def remote_properties
       if @remote_properties.nil?
         home_dir = exec!('echo $HOME')
         settings_file = File.join(home_dir,".checksum-tools-system")
         if file_exists?(settings_file)
-          @remote_properties = YAML.load(file_read(settings_file))
+          @remote_properties = YAML.load_file(settings_file)
         else
           raise ConfigurationError, "Checksum Tools not configured for #{@user}@#{host}. Please use the --openssl parameter to specify the location of the remote openssl binary."
         end
@@ -140,7 +140,7 @@ module Checksum::Tools
       file_open(settings_file, 'w') { |io| YAML.dump(remote_properties, io) }
       remote_properties
     end
-    
+
   end
-  
+
 end
