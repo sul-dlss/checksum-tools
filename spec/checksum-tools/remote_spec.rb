@@ -4,13 +4,13 @@ require 'tempfile'
 describe Checksum::Tools::Remote do
 
   describe "file operations" do
-    
-    before :all do      
+
+    before :all do
       @mock_sftp = Class.new do
         def dir
           Class.new do
             def self.[](*args)
-              Dir[File.join(*args)].collect { |s| 
+              Dir[File.join(*args)].collect { |s|
                 name = s[args.first.length..-1]
                 stat = File.stat(s)
                 type = stat.mode & 0040000 != 0 ? Net::SFTP::Protocol::V04::Attributes::T_DIRECTORY : Net::SFTP::Protocol::V04::Attributes::T_REGULAR
@@ -62,37 +62,37 @@ describe Checksum::Tools::Remote do
       @tool.stub(:remote_properties).and_return({ :openssl => 'openssl' })
       @tool.stub(:sftp).and_return(sftp)
       @tool.stub(:ssh).and_return(ssh)
-      # KLUDGE ALERT: We can't mock an entire asynchronous SSH session, so we're 
-      #               stubbing Checksum::Tools::Remote#exec! which is one of the 
+      # KLUDGE ALERT: We can't mock an entire asynchronous SSH session, so we're
+      #               stubbing Checksum::Tools::Remote#exec! which is one of the
       #               methods we should be testing!
       @tool.stub(:exec!) { |c| %x[#{c} 2>/dev/null].chomp }
     end
-  
+
     after :each do
       @tool = nil
     end
-    
+
     it "should be of the correct type" do
       @tool.should be_a(Checksum::Tools::Remote)
     end
-    
+
     it "should report correct digest lengths" do
       @tool.digest_length(:md5).should == 32
       @tool.digest_length(:sha1).should == 40
     end
-    
+
     it "should report on file size" do
       @tool.send(:file_size,File.join(@dir,'one/two/report.pdf')).should == 134833
       lambda { @tool.send(:file_size,File.join(@dir,'one/two/nonexistent.txt')) }.should raise_error(Errno::ENOENT)
     end
-    
+
     it "should calculate checksums for a file" do
       pending('Checksum::Tools::Remote#exec! is stubbed and does not execute under CI') if ENV['TRAVIS']
       result = @tool.digest_file(File.join(@dir,'one/two/ignore.doc'))
       result.should == { :md5 => 'a8b0d13fd645acc29b0dc2c4837e6f00', :sha1 => '8e129fe06c0679ce5a7f6e58d60cfd488512913a' }
       lambda { @tool.digest_file(File.join(@dir,'one/two/nonexistent.txt')) }.should raise_error(Errno::ENOENT)
     end
-  
+
     it "should generate checksums for a tree of files" do
       pending('Checksum::Tools::Remote#exec! is stubbed and does not execute under CI') if ENV['TRAVIS']
       listener = double('listener')
@@ -103,14 +103,14 @@ describe Checksum::Tools::Remote do
       strings = File.read(File.join(@dir,'one/two/report.pdf.digest')).split(/\n/)
       strings.should include("MD5(report.pdf)= fda5eab2335987f56d7d3abe53734295")
       strings.should include("SHA1(report.pdf)= 56ea04102e0388de9b9c31c6db8aebbff67671c1")
-    
+
       strings = File.read(File.join(@dir,'three/video.mp4.digest')).split(/\n/)
       strings.should include("MD5(video.mp4)= 9023e975b52be97a4ef6ad4e25e2ef79")
       strings.should include("SHA1(video.mp4)= ce828086b63e6b351d9fb6d6bc2b0838725bdf37")
-    
-      File.exists?(File.join(@dir,'one/two/ignore.doc.digest')).should be_false
+
+      File.exists?(File.join(@dir,'one/two/ignore.doc.digest')).should be false
     end
-  
+
     it "should pass verification for a tree of files" do
       pending('Checksum::Tools::Remote#exec! is stubbed and does not execute under CI') if ENV['TRAVIS']
       listener = double('listener')
@@ -141,7 +141,7 @@ describe Checksum::Tools::Remote do
          |*args| listener.progress(*args)
       end
     end
-  
+
   end
-  
+
 end
