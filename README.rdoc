@@ -32,6 +32,7 @@ This gem should not be used for new workflows. This gem exists and is maintained
     -o, --overwrite                  Overwrite existing digest files
     -q, --quiet                      Hide the progress bar
     -r, --recursive                  Recurse into subdirectories
+    -s, --openssl PATH               Specify location of openssl on remote server
     -x, --exclude MASK               Exclude files matching MASK
     -D, --digest-types               Show digest types
     -v, --version                    Print version and exit
@@ -82,6 +83,10 @@ Do not display a progress bar for each file generated.
 <tt>-r, --recursive</tt>
 
 Recurse into subdirectories.
+
+<tt>-s, --openssl PATH</tt>
+
+Specify location of openssl on remote server
 
 <tt>-v, --version</tt>
 
